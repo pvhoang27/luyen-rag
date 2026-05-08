@@ -1,6 +1,6 @@
 # ============================
-# CHUNKING PRACTICE - BÀI 5
-# Semantic Chunking (simple version)
+# CHUNKING PRACTICE - BÀI 5 (FIXED)
+# Semantic Chunking - rõ ràng từng bước
 # ============================
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -22,47 +22,60 @@ Hồ sơ được tiếp nhận, thẩm định, phê duyệt và giải ngân t
 """
 
 
-# 2. Split sentences
+# 2. Split sentences rõ ràng
 sentences = [s.strip() for s in fake_doc.split("\n") if s.strip()]
 
 
-# 3. Convert sentences to vectors (TF-IDF demo)
+# 3. Vector hóa
 vectorizer = TfidfVectorizer()
 vectors = vectorizer.fit_transform(sentences)
 
 
-# 4. Semantic chunking
+# 4. Semantic chunking (debug version)
 threshold = 0.3
-chunks = []
 
+chunks = []
 current_chunk = [sentences[0]]
 
+print("\n===== SENTENCES =====")
+for i, s in enumerate(sentences):
+    print(f"{i+1}. {s}")
+
+print("\n===== BUILDING CHUNKS =====")
+
 for i in range(1, len(sentences)):
-    sim = cosine_similarity(
-        vectors[i - 1],
-        vectors[i]
-    )[0][0]
+
+    prev_vec = vectors[i - 1]
+    curr_vec = vectors[i]
+
+    sim = cosine_similarity(prev_vec, curr_vec)[0][0]
+
+    print(f"\nSo sánh:")
+    print(f"- Câu trước: {sentences[i-1]}")
+    print(f"- Câu hiện tại: {sentences[i]}")
+    print(f"- Similarity: {sim:.4f}")
 
     if sim > threshold:
+        print("=> GỘP vào chunk hiện tại")
         current_chunk.append(sentences[i])
     else:
+        print("=> TẠO chunk mới")
         chunks.append(" ".join(current_chunk))
         current_chunk = [sentences[i]]
 
-# add last chunk
+# add chunk cuối
 if current_chunk:
     chunks.append(" ".join(current_chunk))
 
 
-# 5. Print result
+# 5. In kết quả rõ ràng
 print("\n" + "=" * 60)
-print("SEMANTIC CHUNKING")
+print("FINAL CHUNKS")
 print("=" * 60)
 
 for i, chunk in enumerate(chunks):
     print(f"\n--- Chunk {i+1} ---")
     print(chunk)
     print("-" * 40)
-
 
 print(f"\nTổng số chunk: {len(chunks)}")
